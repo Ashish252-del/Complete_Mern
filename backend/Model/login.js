@@ -1,24 +1,30 @@
 
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const UserModel = mongoose.Schema({ // USerModel is a instance
+const UserModel = mongoose.Schema(
+  {
+    // USerModel is a instance
     name: { type: String, require: true, trim: true },
-    contact: { type: Number, require: true, },
-    address: {
-        type: String, require: true, trim: true
-    },
+    username: { type: String, require: true },
     email: { type: String, require: true, trim: true },
-    password: { type: String, require: true, trim: true },
+    phn: { type: Number, require: true, trim: true },
+    gender: {
+      type: String,
+      require: true,
+      trim: true,
+    },
+    pass: { type: String, require: true, trim: true },
+    
     tokens: [
-        {
-            token: {
-                type: String,
-                require:true
-            }
-        }
-    ]
-},
-    { timeStamps: true }
+      {
+        token: {
+          type: String,
+          require: true,
+        },
+      },
+    ],
+  },
+  { timeStamps: true }
 );
 
 // we are generating token

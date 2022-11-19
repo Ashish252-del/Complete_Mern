@@ -5,29 +5,32 @@ const UserSchema = require("../Model/login");
 const bcrypt = require("bcrypt");
 router.post("/user", async(req,res) => {
     try {
-      const { name, contact, email, address, password } = req.body;
-      if (!name || !contact || !email || !address || !password) {
+      const { name, username, email, phn, gender, pass } = req.body;
+      if (!name || !username || !email || !phn || !gender || !pass) {
         return res.status(422).json({ error: "please fill all the fields" });
       }
       // note UserSchema.findOne will look in mongodb collection and here first email is from detabase and second one etered in postman or
       // frontend .findOne mehtode return document of that particular email id
       // means if you need to get uniquqe data
+   
       UserSchema.findOne({ email: email }).then((userExist) => {
         if (userExist)
           return res.status(422).json({ error: "user already exist" });
       });
-      const encryptedpass = await bcrypt.hash(password, 12); //code for encrypting
+      const encryptedpass = await bcrypt.hash(pass, 12); //code for encrypting
       const newUser = new UserSchema({
         name,
-        contact,
+        username,
         email,
-        address,
-        password: encryptedpass,
+        phn,
+        gender,
+        pass: encryptedpass,
       });
       await newUser.save();
       res.json({ success: true, message: "new user is logged in" });
     } catch (error) {
-        console.log(error);
+      console.log("Getting an error");
+        console.log(error );
         res.status(404).json({success:false, message:"user is not creates"})
     }
 })
