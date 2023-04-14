@@ -16,8 +16,8 @@ import Button from "@mui/material/Button";
 import { NavLink } from "react-router-dom";
 
 const drawerWidth = 240;
-const navItems = ["Home", "About", "Contact", "Registration" , "Login"];
-const rout = ["", "About", "Contact", "Registration", "Login"];
+const navItems = ["Home", "About", "Contact", "Profile", "Registration" , "Login"];
+const rout = ["", "About", "Contact", "Profile", "Registration", "Login"];
 function DrawerAppBar(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);

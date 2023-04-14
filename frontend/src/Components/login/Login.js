@@ -1,6 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './login.css'
 export default function Login() {
+  const navigate = useNavigate();
+  const [email, setemail] = useState();
+  const [password, setpassword] = useState();
+  const handleSubmit = async(e) => {
+    try {
+      e.preventDefault();
+       const resp = await axios.post('/signin',
+         { email: email, password: password });
+     if (resp.data.success === true) alert("logged in successfully");
+       console.log(email + " " + password);
+       setemail("");
+       setpassword("");
+      navigate('/')
+    } catch (error) {
+      if (error.response.status === 400) alert("Invalid credential");
+      console.log(error);
+      
+    }
+  
+  }
     return (
       <div className="log">
         <div className="wrapper login">
@@ -22,14 +44,19 @@ export default function Login() {
             <div className="col-right">
               <div className="login-form">
                 <h2>Login</h2>
-                <form action="">
+                <form onSubmit={handleSubmit}>
                   <p>
                     <label>
                       Username or email address<span>*</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="Username or Email"
+                      name='email'
+                      value={email}
+                      onChange = {(e)=>{
+                        setemail(e.target.value);
+                      }}
+                      placeholder="Email"
                       required
                     />
                   </p>
@@ -37,7 +64,10 @@ export default function Login() {
                     <label>
                       Password<span>*</span>
                     </label>
-                    <input type="password" placeholder="Password" required />
+                    <input type="password" placeholder="Password" required
+                      value={password} onChange={(e) => {
+                        setpassword(e.target.value)
+                      }} />
                   </p>
                   <p>
                     <input type="submit" value="Sign In" />

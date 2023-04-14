@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const UserSchema = require("../Model/login");
 const bcrypt = require("bcrypt");
+const authenticate = require('../middleware/authenticate')
 router.post("/user", async(req,res) => {
     try {
       const { name, username, email, phn, gender, pass } = req.body;
@@ -13,10 +14,11 @@ router.post("/user", async(req,res) => {
       // frontend .findOne mehtode return document of that particular email id
       // means if you need to get uniquqe data
    
-      UserSchema.findOne({ email: email }).then((userExist) => {
-        if (userExist)
-          return res.status(422).json({ error: "user already exist" });
-      });
+      const result = await UserSchema.findOne({ email: email });
+      if (result) {
+        res.status(422).json({ error: "user already exist" });
+        throw new Error("User already exists!") // after throw new error it will go in error block
+      }
       const encryptedpass = await bcrypt.hash(pass, 12); //code for encrypting
       const newUser = new UserSchema({
         name,
@@ -26,7 +28,7 @@ router.post("/user", async(req,res) => {
         gender,
         pass: encryptedpass,
       });
-      await newUser.save();
+       await newUser.save();
       res.json({ success: true, message: "new user is logged in" });
     } catch (error) {
       console.log("Getting an error");
@@ -45,10 +47,13 @@ router.post('/signin', async (req, res) => {
      const userLogin = await UserSchema.findOne({ email: email }); // in case email does not matched then null will be return by findOne
       // console.log(userLogin);
      // for checking password
-     const isMatched = await bcrypt.compare(password, userLogin.password);
+     
+     if (!userLogin) { return res.status(400).json({ error: "invalid email or password" }); }
+   
+     const isMatched = await bcrypt.compare(password, userLogin.pass);
 
-     if ((!userLogin)||(!isMatched)) {
-       res.json({ error: "invalid email or password" });
+     if ((!isMatched)) {
+      return res.status(400).json({ error: "invalid email or password" });
      } else {
        // getting token
        let token = await userLogin.generateAuthToken();
@@ -58,11 +63,28 @@ router.post('/signin', async (req, res) => {
        // first parameter is cookie name and second is its value
        res.cookie("jwtoken", token, {
          expires: new Date(Date.now() + 25892000000), // after this time token will expire and user will log out Date.now()+25892000000 is in mili second wich is eqaul to 30 days
+         httpOnly: true
+         //secure:true  //it is applicable when we use https method
        });
-       res.json({ message: "log in successfully" });
+       res.json({ success:true , message: "log in successfully" });
      }
    } catch (error) {
        console.log(error);
    }
- })
-module.exports= router;
+})
+ //About us ka page
+router.get('/about', authenticate, (req, res) => {
+  console.log(`hello my About`)
+  res.json({success:true ,  data: req.rootUser })
+});
+
+
+// Log out ka page
+router.get('/logout', (req, res) => {
+  // we are clearing the cookie once cookie clear then user will log out
+  res.clearCookie("jwtoken");
+  res.status(200).json({message:'user logged out'})
+
+
+})
+module.exports = router;

@@ -8,6 +8,8 @@ import Registration from "./Components/Register/Registration";
 import Login from "./Components/login/Login";
 import Error from "./Components/Error";
 import { Switch } from "@mui/material";
+import Profile from "./Components/Profile/profile";
+
 function App() {
   const location = useLocation();
   return (
@@ -20,7 +22,9 @@ function App() {
           <Route path="/About" element={<About />} />
           <Route path="/Contact" element={<Contact />} />
           <Route path="/Registration" element={<Registration />} />
-          <Route path="/Login" element={<Login />} />
+        <Route path="/Login" element={<Login />} />
+        <Route path="/Profile" element={<Profile />} />
+      
           <Route path="*" element={<Error />} />
         </Routes>
      
